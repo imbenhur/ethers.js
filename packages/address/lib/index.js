@@ -81,6 +81,19 @@ function getAddress(address) {
         }
         // Maybe ICAP? (we only support direct mode)
     }
+    else if (address.match(/^(xdc)?[0-9a-fA-F]{40}$/)) {
+			// Missing the 0x prefix
+			address = "0x" + address.substr(3)
+			if (address.substring(0, 2) !== "0x") {
+				address = "0x" + address;
+			}
+			result = getChecksumAddress(address);
+			// It is a checksummed address with a bad checksum
+			if (address.match(/([A-F].*[a-f])|([a-f].*[A-F])/) && result !== address) {
+				logger.throwArgumentError("bad address checksum", "address", address);
+			}
+			// Maybe ICAP? (we only support direct mode)
+		}
     else if (address.match(/^XE[0-9]{2}[0-9A-Za-z]{30,31}$/)) {
         // It is an ICAP address with a bad checksum
         if (address.substring(2, 4) !== ibanChecksum(address)) {
